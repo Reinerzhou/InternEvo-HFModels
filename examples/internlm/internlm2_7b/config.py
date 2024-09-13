@@ -3,7 +3,7 @@ model_type = "huggingface_internlm2_7b"
 JOB_NAME = f"train_{model_type}"
 DO_ALERT = False
 
-SEQ_LEN = 2048
+SEQ_LEN = 1024
 
 MODEL_ONLY_FOLDER = "local:llm_ckpts/xxxx"
 SAVE_CKPT_FOLDER = "local:llm_ckpts"
@@ -20,18 +20,20 @@ ckpt = dict(
     oss_snapshot_freq=int(CHECKPOINT_EVERY / 2),
 )
 
-TRAIN_FOLDER = "roneneldan/TinyStories"
+# TRAIN_FOLDER = "roneneldan/TinyStories"
+TRAIN_FOLDER = "/home/pujiang/zhousl/hf-TinyStories"
 VALID_FOLDER = None
 data = dict(
     type="streaming",
-    tokenizer_path="internlm/internlm2-7b",
+    # tokenizer_path="internlm/internlm2-7b",
+    tokenizer_path="/home/pujiang/zhousl/files",
     seq_len=SEQ_LEN,
     micro_num=4,
-    micro_bsz=2,
+    micro_bsz=1,
     valid_micro_num=4,
     valid_every=0,
     pack_sample_into_one=False,
-    total_steps=50000,
+    total_steps=100,
     skip_batches="",
     rampup_batch_size="",
     min_length=50,
@@ -117,9 +119,11 @@ model = dict(
 
 parallel = dict(
     zero1=dict(size=-1),
-    tensor=dict(size=2, mode="isp"),
+    # tensor=dict(size=2),
+    tensor=dict(size=1, mode="mtp"),
+    # tensor=dict(size=2, mode="isp"),
     pipeline=dict(size=1, interleaved_overlap=True),
-    weight=dict(size=2, overlap=False, memory_pool=True),
+    weight=dict(size=1, overlap=False, memory_pool=True),
 )
 
 cudnn_deterministic = False

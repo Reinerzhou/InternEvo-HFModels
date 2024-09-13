@@ -780,7 +780,9 @@ class InternLM2DecoderLayer(nn.Module):
         # Fully Connected
         residual = hidden_states
         hidden_states = self.ffn_norm(hidden_states)
+        torch.cuda.empty_cache()
         hidden_states = self.feed_forward(hidden_states)
+        torch.cuda.empty_cache()
         hidden_states = residual + hidden_states
 
         outputs = (hidden_states,)

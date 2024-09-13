@@ -117,7 +117,8 @@ model = dict(
 
 parallel = dict(
     zero1=dict(size=-1),
-    tensor=dict(size=2, mode="isp"),
+    # tensor=dict(size=2, mode="isp"),
+    tensor=dict(size=2),
     pipeline=dict(size=1, interleaved_overlap=True),
     weight=dict(size=2, overlap=False, memory_pool=True),
 )
