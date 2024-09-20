@@ -207,8 +207,14 @@ class LlamaRotaryEmbedding(nn.Module):
             self._dynamic_frequency_update(position_ids, device=x.device)
 
         # Core RoPE block
+        # import pdb; pdb.set_trace()
+        # print(self.inv_freq.shape, position_ids.shape, flush=True)
         inv_freq_expanded = self.inv_freq[None, :, None].float().expand(position_ids.shape[0], -1, 1)
+        # import pdb; pdb.set_trace()
+        # print("213", flush=True)
         position_ids_expanded = position_ids[:, None, :].float()
+        # import pdb; pdb.set_trace()
+        # print("215", flush=True)
         # Force float32 (see https://github.com/huggingface/transformers/pull/29285)
         device_type = x.device.type
         device_type = device_type if isinstance(device_type, str) and device_type != "mps" else "cpu"
@@ -945,26 +951,34 @@ class LlamaModel(LlamaPreTrainedModel):
         return_dict: Optional[bool] = None,
         cache_position: Optional[torch.LongTensor] = None,
     ) -> Union[Tuple, BaseModelOutputWithPast]:
+        # import pdb; pdb.set_trace()
         output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
         output_hidden_states = (
             output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
         )
+        # import pdb; pdb.set_trace()
+
         use_cache = use_cache if use_cache is not None else self.config.use_cache
         return_dict = return_dict if return_dict is not None else self.config.use_return_dict
+        # import pdb; pdb.set_trace()
 
         if (input_ids is None) ^ (inputs_embeds is not None):
             raise ValueError(
                 "You cannot specify both input_ids and inputs_embeds at the same time, and must specify either one"
             )
+        # import pdb; pdb.set_trace()
 
         if self.gradient_checkpointing and self.training and use_cache:
             logger.warning_once(
                 "`use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`."
             )
             use_cache = False
+        # import pdb; pdb.set_trace()
 
         if inputs_embeds is None:
             inputs_embeds = self.embed_tokens(input_ids)
+
+        # import pdb; pdb.set_trace()
 
         return_legacy_cache = False
         if (
@@ -976,21 +990,27 @@ class LlamaModel(LlamaPreTrainedModel):
                 "We detected that you are passing `past_key_values` as a tuple and this is deprecated and will be removed in v4.43. "
                 "Please use an appropriate `Cache` class (https://huggingface.co/docs/transformers/internal/generation_utils#transformers.Cache)"
             )
+        # import pdb; pdb.set_trace()
 
         if cache_position is None:
             past_seen_tokens = past_key_values.get_seq_length() if past_key_values is not None else 0
             cache_position = torch.arange(
                 past_seen_tokens, past_seen_tokens + inputs_embeds.shape[1], device=inputs_embeds.device
             )
+        # import pdb; pdb.set_trace()
+        
         if position_ids is None:
             position_ids = cache_position.unsqueeze(0)
+        # import pdb; pdb.set_trace()
 
         causal_mask = self._update_causal_mask(
             attention_mask, inputs_embeds, cache_position, past_key_values, output_attentions
         )
         hidden_states = inputs_embeds
+        # import pdb; pdb.set_trace()
 
         # create position embeddings to be shared across the decoder layers
+        # import pdb; pdb.set_trace()
         position_embeddings = self.rotary_emb(hidden_states, position_ids)
 
         # decoder layers

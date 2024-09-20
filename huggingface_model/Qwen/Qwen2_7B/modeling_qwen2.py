@@ -166,6 +166,7 @@ class Qwen2MLP(nn.Module):
         self.act_fn = ACT2FN[config.hidden_act]
 
     def forward(self, hidden_state):
+        torch.cuda.empty_cache()
         return self.down_proj(self.act_fn(self.gate_proj(hidden_state)) * self.up_proj(hidden_state))
 
 
@@ -420,6 +421,10 @@ class Qwen2FlashAttention2(Qwen2Attention):
         query_states = query_states.transpose(1, 2)
         key_states = key_states.transpose(1, 2)
         value_states = value_states.transpose(1, 2)
+
+        # print(query_states.dtype, flush=True)
+        # raise ValueError("test")
+        # import pdb; pdb.set_trace()
 
         if use_packed_dataset:
             attn_output = isp_flash_attn_varlen_func(
