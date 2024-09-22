@@ -3,7 +3,7 @@ model_type = "huggingface_internlm2_7b"
 JOB_NAME = f"train/internlm/internlm2_7b"
 DO_ALERT = False
 
-SEQ_LEN = 2048
+SEQ_LEN = 1024
 
 MODEL_ONLY_FOLDER = "local:llm_ckpts/xxxx"
 SAVE_CKPT_FOLDER = "local:llm_ckpts"
@@ -20,18 +20,18 @@ ckpt = dict(
     oss_snapshot_freq=int(CHECKPOINT_EVERY / 2),
 )
 
-TRAIN_FOLDER = "roneneldan/TinyStories"
+TRAIN_FOLDER = "/gpfs/zhousl/hf-TinyStories"
 VALID_FOLDER = None
 data = dict(
     type="streaming",
-    tokenizer_path="internlm/internlm2-7b",
+    tokenizer_path="/gpfs/zhousl/internlm2-chat-7b",
     seq_len=SEQ_LEN,
-    micro_num=4,
+    micro_num=1,
     micro_bsz=2,
     valid_micro_num=4,
     valid_every=0,
     pack_sample_into_one=False,
-    total_steps=50000,
+    total_steps=200,
     skip_batches="",
     rampup_batch_size="",
     min_length=50,
@@ -117,7 +117,7 @@ model = dict(
 
 parallel = dict(
     zero1=dict(size=-1),
-    tensor=dict(size=1, mode="mtp"),
+    tensor=dict(size=2, mode="isp"),
     pipeline=dict(size=1, interleaved_overlap=True),
     weight=dict(size=1, overlap=False, memory_pool=True),
 )
